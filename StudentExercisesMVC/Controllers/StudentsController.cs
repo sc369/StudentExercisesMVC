@@ -1,63 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using StudentExercisesMVC.Models;
-using Microsoft.Extensions.Configuration;
-using StudentExercisesMVC.Repositories;
 using StudentExercisesMVC.Models.ViewModels;
+using StudentExercisesMVC.Repositories;
 
 namespace StudentExercisesMVC.Controllers
 {
     public class StudentsController : Controller
     {
-       
         // GET: Students
         public ActionResult Index()
-        {
-            var students = StudentRepository.GetStudents();                                   
-                    return View(students);
-                
-            
+        {      
+            var students = StudentRepository.GetStudents();
+            return View(students);
         }
 
         // GET: Students/Details/5
         public ActionResult Details(int id)
         {
             var student = StudentRepository.GetStudent(id);
-            return View(student);     
+            return View(student);
         }
-
 
         // GET: Students/Create
         public ActionResult Create()
         {
-            return View();
+            StudentCreateViewModel model = new StudentCreateViewModel();
+            return View(model);
         }
 
         // POST: Students/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create([FromForm] StudentCreateViewModel model)
         {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var student = StudentRepository.CreateStudent(model.Student);
+            return RedirectToAction(nameof(Index));
         }
 
-        //GET: Students/Edit/5
-         public ActionResult Edit(int id)
+        // GET: Students/Edit/5
+        public ActionResult Edit(int id)
         {
             var model = new StudentEditViewModel(id);
             return View(model);
@@ -66,40 +49,52 @@ namespace StudentExercisesMVC.Controllers
         // POST: Students/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, StudentEditViewModel model)
         {
             try
             {
-                // TODO: Add update logic here
+                // Update the student record in the database
+                model.Student.Id = id;
+                StudentRepository.UpdateStudent(model.Student);
+
+                // Clear out all assigned exercises
+                ExerciseRepository.ClearAssignedExercises(model.Student.Id);
+
+                // Assign exercises selected in the form
+                if (model.SelectedExercises.Count > 0)
+                {
+                    model.SelectedExercises.ForEach(i =>
+                        ExerciseRepository.AssignToStudent(i, model.Student.Id));
+                }
 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                Console.WriteLine(ex.ToString());
+                return View(model);
             }
         }
 
         // GET: Students/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult DeleteConfirm(int id)
         {
-            return View();
+            var student = StudentRepository.GetStudent(id);
+            return View(student);
         }
 
         // POST: Students/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete([FromForm] int id)
         {
-            try
+            if (StudentRepository.DeleteStudent(id))
             {
-                // TODO: Add delete logic here
-
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            else
             {
-                return View();
+                return RedirectToAction(nameof(Details), new { id = id });
             }
         }
     }
