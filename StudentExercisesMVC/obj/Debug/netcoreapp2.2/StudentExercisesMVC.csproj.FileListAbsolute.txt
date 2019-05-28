@@ -32,3 +32,4 @@ C:\Users\Stephen\workspace\csharp\StudentExercisesMVC\StudentExercisesMVC\obj\De
 C:\Users\Stephen\workspace\csharp\StudentExercisesMVC\StudentExercisesMVC\obj\Debug\netcoreapp2.2\Razor\Views\Students\Edit.g.cshtml.cs
 C:\Users\Stephen\workspace\csharp\StudentExercisesMVC\StudentExercisesMVC\obj\Debug\netcoreapp2.2\Razor\Views\Students\Details.g.cshtml.cs
 C:\Users\Stephen\workspace\csharp\StudentExercisesMVC\StudentExercisesMVC\obj\Debug\netcoreapp2.2\Razor\Views\Students\DeleteConfirm.g.cshtml.cs
+C:\Users\Stephen\workspace\csharp\StudentExercisesMVC\StudentExercisesMVC\obj\Debug\netcoreapp2.2\Razor\Views\Students\Create.g.cshtml.cs
